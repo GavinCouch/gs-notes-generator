@@ -289,14 +289,14 @@ function buildNote() {
   const sentences = [];
 
   // ---- device specific: iPhone ----
-  if (device === "iphone") {
     const reps = selectedValues(iphoneRepairs)
       .filter(v => v !== "other")
       .map(v => {
-        if (v === "whole unit") return "whole unit";
-        if (v === "truedepth") return "TrueDepth";
-        return v;
+        if (v === "whole unit") return "a whole unit replacement";
+        if (v === "truedepth") return "the TrueDepth system";
+        return `the ${v}`;
       });
+
 
     const other = (iphoneOther.value || "").trim();
     if (selectedValues(iphoneRepairs).includes("other") && other) reps.push(other);
