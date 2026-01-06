@@ -77,17 +77,13 @@ const copyBtn = $("copyBtn");
 const resetBtn = $("resetBtn");
 
 let softwareItems = [];
-let pcSelectedParts = []; // values from select
 let partActionMap = new Map(); // part -> "installed"|"replaced"
 
-// ----------------- helpers -----------------
+// ---------- helpers ----------
 function selectedValues(selectEl) {
   return Array.from(selectEl.selectedOptions).map(o => o.value);
 }
-function capFirst(s) {
-  if (!s) return s;
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
+
 function joinHuman(list) {
   const arr = list.filter(Boolean);
   if (arr.length === 0) return "";
@@ -95,122 +91,44 @@ function joinHuman(list) {
   if (arr.length === 2) return `${arr[0]} and ${arr[1]}`;
   return `${arr.slice(0, -1).join(", ")}, and ${arr[arr.length - 1]}`;
 }
+
 function getRadio(name) {
   const el = document.querySelector(`input[name="${name}"]:checked`);
   return el ? el.value : "";
 }
+
 function setHidden(el, hidden) {
   el.classList.toggle("hidden", !!hidden);
 }
+
 function normalizeInitials(s) {
   return (s || "").trim().toUpperCase();
 }
+
 function sentence(s) {
   const t = (s || "").trim();
   if (!t) return "";
   return /[.!?]$/.test(t) ? t : (t + ".");
 }
 
-// ----------------- UI toggles -----------------
-function refreshUI() {
-  const device = deviceSel.value;
-
-  setHidden(iphoneSection, device !== "iphone");
-  setHidden(pcHardwareSection, device !== "pc");
-
-  // software section rules:
-  // - iPhone: none
-  // - MacBook: always software details shown (no "did software" question)
-  // - PC: show "did software" question; details only if yes
-  setHidden(softwareSection, device === "");
-  if (device === "iphone") {
-    setHidden(softwareSection, true);
-  } else if (device === "mac") {
-    setHidden(softwareSection, false);
-    setHidden(pcSoftwareDidWrap, true);
-    softwareDetails.classList.remove("hidden");
-  } else if (device === "pc") {
-    setHidden(softwareSection, false);
-    setHidden(pcSoftwareDidWrap, false);
-    const swDid = getRadio("swDid");
-    setHidden(softwareDetails, swDid !== "yes");
-  }
-
-  // MacBook: hide driver updates option
-  $$(".pcOnly").forEach(el => {
-    if (device === "mac") el.parentElement.classList.add("hidden");
-    else el.parentElement.classList.remove("hidden");
-  });
-
-  // PC hardware details shown only if hwDid yes
-  if (device === "pc") {
-    const hwDid = getRadio("pcHwDid");
-    setHidden(pcHwDetails, hwDid !== "yes");
-  }
-
-  // iPhone "Other"
-  const iphoneSel = selectedValues(iphoneRepairs);
-  setHidden(iphoneOtherWrap, !iphoneSel.includes("other"));
-
-  // PC parts / custom build handling
-  if (device === "pc") {
-    const parts = selectedValues(pcHwParts);
-
-    const customSelected = parts.includes("custom build");
-    setHidden(customBuildWrap, !customSelected);
-
-    if (customSelected) {
-      // if custom build selected, force only that option selected
-      Array.from(pcHwParts.options).forEach(opt => {
-        if (opt.value !== "custom build") opt.selected = false;
-      });
-      pcSelectedParts = ["custom build"];
-      // no part actions list for custom build
-      setHidden(pcPartActions, true);
-    } else {
-      pcSelectedParts = parts;
-      setHidden(pcPartActions, pcSelectedParts.length === 0);
-      renderPartActions(pcSelectedParts);
-    }
-  }
-
-  // Hardware success -> failure reason
-  const hwSuccess = getRadio("pcHwSuccess");
-  setHidden(pcHwFailWrap, hwSuccess !== "no");
-
-  // Diagnostics nested
-  setHidden(diagWrap, !swDiagnostics.checked);
-  const diagPass = getRadio("diagPass");
-  setHidden(diagFailWrap, diagPass !== "no" || !swDiagnostics.checked);
-
-  const diagReplaced = getRadio("diagReplaced");
-  setHidden(diagNowPassWrap, diagPass !== "no" || diagReplaced !== "yes" || !swDiagnostics.checked);
-
-  // OS repair nested
-  setHidden(osRepairWrap, !swOsRepair.checked);
-
-  // DBU nested
-  setHidden(dbuWrap, !swDbu.checked);
-  const dbuSuccess = getRadio("dbuSuccess");
-  setHidden(dbuFailReasonWrap, dbuSuccess !== "no" || !swDbu.checked);
-
-  // Installs nested
-  setHidden(installsWrap, !swInstalls.checked);
-
-  // AV nested
-  setHidden(avWrap, !swAv.checked);
-  setHidden(avOtherWrap, avName.value !== "Other" || !swAv.checked);
-
-  // OS install nested
-  setHidden(osInstallWrap, !swOsInstall.checked);
-
-  // final section visible once device chosen
-  setHidden(finalSection, device === "");
+function capFirst(s) {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function enforceLength(note) {
+  const words = note.trim().split(/\s+/).filter(Boolean).length;
+  if (words > 500) {
+    warn.textContent = `Note is about ${words} words. Consider shortening to stay under ~500 words.`;
+    warn.classList.remove("hidden");
+  }
+  return note;
+}
+
+// ---------- UI ----------
 function renderPartActions(parts) {
-  // preserve existing selections where possible
   pcPartActionsList.innerHTML = "";
+
   for (const part of parts) {
     if (!partActionMap.has(part)) partActionMap.set(part, "installed");
 
@@ -235,13 +153,12 @@ function renderPartActions(parts) {
     pcPartActionsList.appendChild(row);
   }
 
-  // clean out removed parts
+  // cleanup removed parts
   for (const key of Array.from(partActionMap.keys())) {
     if (!parts.includes(key)) partActionMap.delete(key);
   }
 }
 
-// ----------------- installs chips -----------------
 function renderSoftwareChips() {
   softwareList.innerHTML = "";
   softwareItems.forEach((name, idx) => {
@@ -271,7 +188,87 @@ addSoftwareBtn.addEventListener("click", () => {
   renderSoftwareChips();
 });
 
-// ----------------- generation logic -----------------
+function refreshUI() {
+  const device = deviceSel.value;
+
+  setHidden(iphoneSection, device !== "iphone");
+  setHidden(pcHardwareSection, device !== "pc");
+
+  // Software section rules:
+  // - iPhone: none
+  // - MacBook: always software (no "did software?" question)
+  // - PC: show "did software?" question; details only if yes
+  setHidden(softwareSection, device === "" || device === "iphone");
+
+  if (device === "mac") {
+    setHidden(pcSoftwareDidWrap, true);
+    softwareDetails.classList.remove("hidden");
+  } else if (device === "pc") {
+    setHidden(pcSoftwareDidWrap, false);
+    const swDid = getRadio("swDid");
+    setHidden(softwareDetails, swDid !== "yes");
+  }
+
+  // MacBook: hide driver updates option
+  $$(".pcOnly").forEach(el => {
+    if (device === "mac") el.classList.add("hidden");
+    else el.classList.remove("hidden");
+  });
+
+  // Final section visible once device chosen
+  setHidden(finalSection, device === "");
+
+  // iPhone other
+  const iphoneSel = selectedValues(iphoneRepairs);
+  setHidden(iphoneOtherWrap, !iphoneSel.includes("other"));
+
+  // PC hardware details
+  if (device === "pc") {
+    const hwDid = getRadio("pcHwDid");
+    setHidden(pcHwDetails, hwDid !== "yes");
+
+    const parts = selectedValues(pcHwParts);
+    const customSelected = parts.includes("custom build");
+    setHidden(customBuildWrap, !customSelected);
+
+    if (customSelected) {
+      // force only custom build
+      Array.from(pcHwParts.options).forEach(opt => {
+        if (opt.value !== "custom build") opt.selected = false;
+      });
+      setHidden(pcPartActions, true);
+    } else {
+      setHidden(pcPartActions, parts.length === 0);
+      if (parts.length) renderPartActions(parts);
+    }
+
+    const hwSuccess = getRadio("pcHwSuccess");
+    setHidden(pcHwFailWrap, hwSuccess !== "no");
+  }
+
+  // nested software sections
+  setHidden(diagWrap, !swDiagnostics.checked);
+  const diagPass = getRadio("diagPass");
+  setHidden(diagFailWrap, !(swDiagnostics.checked && diagPass === "no"));
+
+  const diagReplaced = getRadio("diagReplaced");
+  setHidden(diagNowPassWrap, !(swDiagnostics.checked && diagPass === "no" && diagReplaced === "yes"));
+
+  setHidden(osRepairWrap, !swOsRepair.checked);
+
+  setHidden(dbuWrap, !swDbu.checked);
+  const dbuSuccess = getRadio("dbuSuccess");
+  setHidden(dbuFailReasonWrap, !(swDbu.checked && dbuSuccess === "no"));
+
+  setHidden(installsWrap, !swInstalls.checked);
+
+  setHidden(avWrap, !swAv.checked);
+  setHidden(avOtherWrap, !(swAv.checked && avName.value === "Other"));
+
+  setHidden(osInstallWrap, !swOsInstall.checked);
+}
+
+// ---------- generation ----------
 function buildNote() {
   const device = deviceSel.value;
   const init = normalizeInitials(initials.value);
@@ -286,25 +283,58 @@ function buildNote() {
     return "";
   }
 
+  // One paragraph: we build sentences then join with spaces.
   const sentences = [];
 
-  // ---- device specific: iPhone ----
-    const reps = selectedValues(iphoneRepairs)
-      .filter(v => v !== "other")
-      .map(v => {
-        if (v === "whole unit") return "a whole unit replacement";
-        if (v === "truedepth") return "the TrueDepth system";
-        return `the ${v}`;
-      });
-
-
+  // -------- iPhone --------
+  if (device === "iphone") {
+    const sel = selectedValues(iphoneRepairs);
     const other = (iphoneOther.value || "").trim();
-    if (selectedValues(iphoneRepairs).includes("other") && other) reps.push(other);
 
-    if (reps.length > 0) {
-      sentences.push(sentence(`Performed ${joinHuman(reps)}`));
-    } else {
-      sentences.push(sentence("Hardware repair completed"));
+    const items = [];
+
+    // special-case whole unit replacement
+    if (sel.includes("whole unit")) {
+      // This will be written as: "Performed a whole unit replacement."
+      items.push({ type: "whole", text: "a whole unit replacement" });
+    }
+
+    // normal replaced items
+    const replacedMap = {
+      "display": "the display",
+      "battery": "the battery",
+      "back glass": "the back glass",
+      "rear system": "the rear system",
+      "mid system": "the mid system",
+      "truedepth": "the TrueDepth system",
+      "back camera": "the back camera",
+    };
+
+    const replacedList = [];
+    for (const key of Object.keys(replacedMap)) {
+      if (sel.includes(key)) replacedList.push(replacedMap[key]);
+    }
+
+    if (sel.includes("other") && other) {
+      // write "the <other>" unless they already typed a full phrase
+      const cleaned = other.trim();
+      const startsWithArticle = /^the\s+/i.test(cleaned) || /^a\s+/i.test(cleaned) || /^an\s+/i.test(cleaned);
+      replacedList.push(startsWithArticle ? cleaned : `the ${cleaned}`);
+    }
+
+    // Build output:
+    // If whole unit selected, write it as a separate sentence.
+    if (items.some(x => x.type === "whole")) {
+      sentences.push(sentence("Performed a whole unit replacement"));
+    }
+
+    // If any other replacements, write as "Replaced ..."
+    if (replacedList.length > 0) {
+      sentences.push(sentence(`Replaced ${joinHuman(replacedList)}`));
+    }
+
+    if (sentences.length === 0) {
+      sentences.push(sentence("Repair completed"));
     }
 
     sentences.push(sentence("All necessary diagnostics were completed to ensure a successful repair"));
@@ -320,68 +350,57 @@ function buildNote() {
     return enforceLength(para);
   }
 
-  // ---- PC / Mac shared: software actions ----
-  // PC hardware (if PC)
+  // -------- PC / Mac --------
+
+  // PC hardware
   let isCustomBuild = false;
+  let customBuildSentence = "";
 
   if (device === "pc") {
     const hwDid = getRadio("pcHwDid");
     if (hwDid === "yes") {
       const parts = selectedValues(pcHwParts);
+
       if (parts.includes("custom build")) {
         isCustomBuild = true;
-
         const cbType = getRadio("customBuildType");
-        if (cbType === "built") {
-          sentences.push(sentence("Built a new custom PC from components"));
-        } else if (cbType === "reassembled") {
-          sentences.push(sentence("Reassembled customer-provided custom PC"));
-        } else {
-          sentences.push(sentence("Custom PC build completed"));
-        }
+        if (cbType === "built") customBuildSentence = "Built a new custom PC from components";
+        else if (cbType === "reassembled") customBuildSentence = "Reassembled customer-provided custom PC";
+        else customBuildSentence = "Custom PC build completed";
       } else if (parts.length > 0) {
-        // narrative hardware actions
-        const actionGroups = { installed: [], replaced: [] };
-        parts.forEach(p => {
+        const installed = [];
+        const replaced = [];
+        for (const p of parts) {
           const act = partActionMap.get(p) || "installed";
-          actionGroups[act].push(capFirst(p));
-        });
-
-        if (actionGroups.installed.length) {
-          sentences.push(sentence(`Installed ${joinHuman(actionGroups.installed).toLowerCase()}`));
+          const label = capFirst(p).toLowerCase();
+          if (act === "replaced") replaced.push(label);
+          else installed.push(label);
         }
-        if (actionGroups.replaced.length) {
-          sentences.push(sentence(`Replaced ${joinHuman(actionGroups.replaced).toLowerCase()}`));
+
+        if (installed.length) sentences.push(sentence(`Installed ${joinHuman(installed)}`));
+        if (replaced.length) sentences.push(sentence(`Replaced ${joinHuman(replaced)}`));
+
+        const hwSuccess = getRadio("pcHwSuccess");
+        if (hwSuccess === "no") {
+          sentences.push(sentence("Hardware work was unsuccessful"));
+          const reason = (pcHwFailReason.value || "").trim();
+          if (reason) sentences.push(sentence(reason));
+          if (pcHwIncludeRec.checked) {
+            sentences.push(sentence("Recommended additional service and/or part replacement as needed"));
+          }
         }
       } else {
         sentences.push(sentence("Hardware work completed"));
       }
-
-      const hwSuccess = getRadio("pcHwSuccess");
-      if (hwSuccess === "no") {
-        sentences.push(sentence("Hardware work was unsuccessful"));
-        const reason = (pcHwFailReason.value || "").trim();
-        if (reason) sentences.push(sentence(reason));
-        if (pcHwIncludeRec.checked) {
-          sentences.push(sentence("Recommended additional service and/or part replacement as needed"));
-        }
-      }
     }
   }
 
-  // Determine whether software details should be considered
+  // Software enabled?
   let softwareEnabled = true;
   if (device === "pc") softwareEnabled = (getRadio("swDid") === "yes");
   if (device === "mac") softwareEnabled = true;
 
-  // For ordering:
-  // Normal order:
-  // 1 Hardware repair, 2 OS install, 3 Setup, 4 Diagnostics, 5 OS repair, 6 DBU, 7 Installs, 8 AV, 9 Recycling, 10 Extra
-  // Custom build override:
-  // custom build -> OSI -> setup -> diags -> everything else
-  // (Our sentence list already may include custom build/hardware sentence at the start.)
-
-  // We'll build software sentences into buckets and then append in correct order.
+  // Buckets for strict ordering
   const bucket = {
     osInstall: [],
     setup: [],
@@ -401,7 +420,9 @@ function buildNote() {
       const preserved = getRadio("filesPreserved"); // yes/no
       if (os) {
         if (preserved === "yes") {
-          bucket.osInstall.push(sentence(`Performed a ${os} installation with personal files preserved (software and applications do not carry over)`));
+          bucket.osInstall.push(
+            sentence(`Performed a ${os} installation with personal files preserved (software and applications do not carry over)`)
+          );
         } else {
           bucket.osInstall.push(sentence(`Performed a clean ${os} installation`));
         }
@@ -411,9 +432,7 @@ function buildNote() {
     }
 
     // Setup
-    if (swSetup.checked) {
-      bucket.setup.push(sentence("Completed device setup"));
-    }
+    if (swSetup.checked) bucket.setup.push(sentence("Completed device setup"));
 
     // Diagnostics
     if (swDiagnostics.checked) {
@@ -421,12 +440,9 @@ function buildNote() {
       if (pass === "yes") {
         bucket.diagnostics.push(sentence("All diagnostics passed"));
       } else {
-        const fails = selectedValues(diagFailParts).map(v => v.toUpperCase() === "HDD/SSD" ? "HDD/SSD" : v);
-        if (fails.length) {
-          bucket.diagnostics.push(sentence(`Diagnostics identified issues with ${joinHuman(fails)}`));
-        } else {
-          bucket.diagnostics.push(sentence("Diagnostics identified hardware-related issues"));
-        }
+        const fails = selectedValues(diagFailParts);
+        if (fails.length) bucket.diagnostics.push(sentence(`Diagnostics identified issues with ${joinHuman(fails)}`));
+        else bucket.diagnostics.push(sentence("Diagnostics identified hardware-related issues"));
 
         const replaced = getRadio("diagReplaced");
         if (replaced === "yes") {
@@ -434,9 +450,7 @@ function buildNote() {
           if (nowPass === "yes") bucket.diagnostics.push(sentence("Diagnostics pass after service"));
           else bucket.diagnostics.push(sentence("Diagnostics still indicate issues after service"));
         } else {
-          if (diagIncludeRec.checked) {
-            bucket.diagnostics.push(sentence("Recommended replacement of the affected component(s)"));
-          }
+          if (diagIncludeRec.checked) bucket.diagnostics.push(sentence("Recommended replacement of the affected component(s)"));
         }
       }
     }
@@ -446,11 +460,10 @@ function buildNote() {
       const v = Number(virusesRemoved.value || 0);
       const p = Number(policiesRemoved.value || 0);
 
-      // always include generic statement if selected
       let base = "Performed operating system repair and verified system stability";
       const extras = [];
       if (v > 0) extras.push(`${v} virus${v === 1 ? "" : "es"} removed`);
-      if (p > 0) extras.push(`${p} malicious policy${p === 1 ? "" : "ies"} removed`);
+      if (p > 0) extras.push(`${p} malicious polic${p === 1 ? "y" : "ies"} removed`);
       if (extras.length) base += `, including ${joinHuman(extras)}`;
       bucket.osRepair.push(sentence(base));
     }
@@ -477,9 +490,7 @@ function buildNote() {
 
     // Installs
     if (swInstalls.checked) {
-      // per your preference: “Installed requested applications”
       bucket.installs.push(sentence("Installed requested applications"));
-      // If they added items, we can optionally include them without making it messy:
       if (softwareItems.length) {
         bucket.installs.push(sentence(`Applications installed included ${joinHuman(softwareItems)}`));
       }
@@ -505,13 +516,35 @@ function buildNote() {
     if (device === "pc" && swDriverUpdates.checked) bucket.driverUpdates.push(sentence("Updated device drivers"));
   }
 
-  // Now append buckets in strict order (OSI -> Setup -> Diags -> rest)
-  // Custom build override is already satisfied because custom build sentence is first, then we append OSI/Setup/Diags next.
+  // Apply ordering rules:
+  // - Normal: Hardware already in sentences, then OSI -> Setup -> Diags -> rest -> recycle -> extra
+  // - Custom build override: custom build MUST be first, then OSI -> Setup -> Diags -> rest
+  if (isCustomBuild) {
+    const ordered = [];
+    ordered.push(sentence(customBuildSentence || "Custom PC build completed"));
+    ordered.push(...bucket.osInstall);
+    ordered.push(...bucket.setup);
+    ordered.push(...bucket.diagnostics);
+    ordered.push(...bucket.osRepair);
+    ordered.push(...bucket.dbu);
+    ordered.push(...bucket.installs);
+    ordered.push(...bucket.av);
+    ordered.push(...bucket.updates);
+    ordered.push(...bucket.driverUpdates);
+
+    if (recycled.checked) ordered.push(sentence("Device recycled per customer request"));
+
+    const extra = (extraComments.value || "").trim();
+    if (extra) ordered.push(sentence(extra));
+
+    const para = ordered.join(" ").trim() + ` - ${init}`;
+    return enforceLength(para);
+  }
+
+  // Non-custom-build order:
   sentences.push(...bucket.osInstall);
   sentences.push(...bucket.setup);
   sentences.push(...bucket.diagnostics);
-
-  // everything else in the order you want
   sentences.push(...bucket.osRepair);
   sentences.push(...bucket.dbu);
   sentences.push(...bucket.installs);
@@ -519,9 +552,7 @@ function buildNote() {
   sentences.push(...bucket.updates);
   sentences.push(...bucket.driverUpdates);
 
-  if (recycled.checked) {
-    sentences.push(sentence("Device recycled per customer request"));
-  }
+  if (recycled.checked) sentences.push(sentence("Device recycled per customer request"));
 
   const extra = (extraComments.value || "").trim();
   if (extra) sentences.push(sentence(extra));
@@ -530,32 +561,19 @@ function buildNote() {
   return enforceLength(para);
 }
 
-function enforceLength(note) {
-  // soft warning if long; do not truncate automatically (agent may want full context)
-  const words = note.trim().split(/\s+/).filter(Boolean).length;
-  if (words > 500) {
-    warn.textContent = `Note is about ${words} words. Consider shortening to stay under ~500 words.`;
-    warn.classList.remove("hidden");
-  }
-  return note;
-}
-
-// ----------------- events -----------------
-deviceSel.addEventListener("change", () => {
-  // reset device-specific state minimally
-  refreshUI();
-});
-
+// ---------- events ----------
+deviceSel.addEventListener("change", refreshUI);
 iphoneRepairs.addEventListener("change", refreshUI);
 avName.addEventListener("change", refreshUI);
-
 pcHwParts.addEventListener("change", refreshUI);
+
 $$('input[name="pcHwDid"]').forEach(el => el.addEventListener("change", refreshUI));
 $$('input[name="pcHwSuccess"]').forEach(el => el.addEventListener("change", refreshUI));
 $$('input[name="swDid"]').forEach(el => el.addEventListener("change", refreshUI));
 $$('input[name="diagPass"]').forEach(el => el.addEventListener("change", refreshUI));
 $$('input[name="diagReplaced"]').forEach(el => el.addEventListener("change", refreshUI));
 $$('input[name="dbuSuccess"]').forEach(el => el.addEventListener("change", refreshUI));
+$$('input[name="filesPreserved"]').forEach(el => el.addEventListener("change", refreshUI));
 
 [
   swDiagnostics, swOsRepair, swDbu, swInstalls, swAv, swOsInstall, swSetup, swUpdates, swDriverUpdates
@@ -565,7 +583,6 @@ generateBtn.addEventListener("click", () => {
   const note = buildNote();
   output.value = note;
 
-  // store initials for convenience
   const init = normalizeInitials(initials.value);
   if (init) localStorage.setItem("gs_notes_initials", init);
 });
@@ -585,13 +602,15 @@ copyBtn.addEventListener("click", async () => {
 });
 
 resetBtn.addEventListener("click", () => {
-  // quick reset by reloading UI state but keeping initials from localStorage
   const keepInit = normalizeInitials(initials.value) || localStorage.getItem("gs_notes_initials") || "";
+
+  // reset selects/text/checkboxes
   document.querySelectorAll("input, select, textarea").forEach(el => {
     if (el.id === "initials") return;
+
     if (el.type === "checkbox") el.checked = false;
     else if (el.type === "radio") {
-      // leave radios to default by full reload-like reset:
+      // radios reset below
     } else if (el.tagName === "SELECT") {
       el.value = "";
       Array.from(el.options).forEach(o => o.selected = false);
@@ -600,59 +619,50 @@ resetBtn.addEventListener("click", () => {
     }
   });
 
-  // restore defaults for radios
+  // restore default radios
   // PC defaults
-  document.querySelector('input[name="pcHwDid"][value="no"]').checked = true;
-  document.querySelector('input[name="pcHwSuccess"][value="yes"]').checked = true;
-  pcHwIncludeRec.checked = false;
+  const pcNo = document.querySelector('input[name="pcHwDid"][value="no"]');
+  if (pcNo) pcNo.checked = true;
 
-  // Software defaults
-  const swDidNo = document.querySelector('input[name="swDid"][value="no"]');
-  if (swDidNo) swDidNo.checked = true;
+  const hwYes = document.querySelector('input[name="pcHwSuccess"][value="yes"]');
+  if (hwYes) hwYes.checked = true;
+
+  // Software defaults (PC)
+  const swNo = document.querySelector('input[name="swDid"][value="no"]');
+  if (swNo) swNo.checked = true;
 
   // Diagnostics defaults
-  document.querySelector('input[name="diagPass"][value="yes"]').checked = true;
-  document.querySelector('input[name="diagReplaced"][value="no"]').checked = true;
-  document.querySelector('input[name="diagNowPass"][value="yes"]').checked = true;
+  const diagYes = document.querySelector('input[name="diagPass"][value="yes"]');
+  if (diagYes) diagYes.checked = true;
+
+  const diagRepNo = document.querySelector('input[name="diagReplaced"][value="no"]');
+  if (diagRepNo) diagRepNo.checked = true;
+
+  const diagNowYes = document.querySelector('input[name="diagNowPass"][value="yes"]');
+  if (diagNowYes) diagNowYes.checked = true;
 
   // DBU defaults
-  document.querySelector('input[name="dbuSuccess"][value="yes"]').checked = true;
+  const dbuYes = document.querySelector('input[name="dbuSuccess"][value="yes"]');
+  if (dbuYes) dbuYes.checked = true;
 
-  // OS install files preserved default yes
-  document.querySelector('input[name="filesPreserved"][value="yes"]').checked = true;
+  // Files preserved default
+  const fpYes = document.querySelector('input[name="filesPreserved"][value="yes"]');
+  if (fpYes) fpYes.checked = true;
 
   softwareItems = [];
   renderSoftwareChips();
   partActionMap.clear();
+
   output.value = "";
   warn.classList.add("hidden");
-
   initials.value = keepInit;
+
   refreshUI();
 });
-
-const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
-const feedbackText = document.getElementById("feedbackText");
-
-if (sendFeedbackBtn) {
-  sendFeedbackBtn.addEventListener("click", () => {
-    const text = (feedbackText.value || "").trim();
-
-    if (!text) {
-      alert("Please enter feedback before sending.");
-      return;
-    }
-
-    const subject = encodeURIComponent("Geek Squad Notes Generator Feedback");
-    const body = encodeURIComponent(text);
-
-    window.location.href =
-      `mailto:gavin.couch@bestbuy.com?subject=${subject}&body=${body}`;
-  });
-}
 
 // init
 (function init() {
   initials.value = localStorage.getItem("gs_notes_initials") || "";
   refreshUI();
 })();
+
