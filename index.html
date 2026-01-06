@@ -226,8 +226,15 @@
           </div>
 
           <div class="row">
-            <label for="dbuAmount">Data transferred (GB)</label>
-            <input id="dbuAmount" type="number" min="0" placeholder="e.g., 238" />
+            <label>Data transferred</label>
+            <div class="inline">
+              <input id="dbuAmount" type="number" min="0" step="any" placeholder="e.g., 238" />
+              <select id="dbuUnit">
+                <option value="MB">MB</option>
+                <option value="GB" selected>GB</option>
+                <option value="TB">TB</option>
+              </select>
+            </div>
           </div>
 
           <div id="dbuFailReasonWrap" class="row hidden">
