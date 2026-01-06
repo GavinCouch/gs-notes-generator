@@ -9,12 +9,10 @@
 <body>
   <header class="wrap">
     <h1>Geek Squad Notes Generator</h1>
-    <div class="feedback-bar">
-  <label for="feedbackText">Have feedback or suggestions?</label>
-<p class="sub">
-  Feedback or suggestions?
-  <a href="mailto:gavin.couch@bestbuy.com">gavin.couch@bestbuy.com</a>
-</p>
+    <p class="sub">
+      Feedback or suggestions?
+      <a href="mailto:gavin.couch@bestbuy.com">gavin.couch@bestbuy.com</a>
+    </p>
   </header>
 
   <main class="wrap">
@@ -35,7 +33,9 @@
     <!-- iPhone: Hardware -->
     <section id="iphoneSection" class="card hidden">
       <h2>iPhone Hardware Repair</h2>
-      <p class="hint">iPhone repairs are always written as <b>replaced</b>, and include a generic diagnostics statement.</p>
+      <p class="hint">
+        iPhone notes always use <b>Replaced</b>. “Whole unit replacement” is written as “Performed a whole unit replacement.”
+      </p>
 
       <div class="row">
         <label for="iphoneRepairs">What was replaced? (multi-select)</label>
@@ -54,7 +54,7 @@
 
       <div id="iphoneOtherWrap" class="row hidden">
         <label for="iphoneOther">Other repair (manual)</label>
-        <input id="iphoneOther" type="text" placeholder="e.g., replaced charging port assembly" />
+        <input id="iphoneOther" type="text" placeholder="e.g., charging port assembly" />
       </div>
     </section>
 
@@ -86,7 +86,10 @@
             <option value="miscellaneous part">Miscellaneous part</option>
             <option value="custom build">Custom build</option>
           </select>
-          <p class="hint">If <b>Custom build</b> is selected, it overrides ordering and disables other parts.</p>
+          <p class="hint">
+            If <b>Custom build</b> is selected, it disables other parts and overrides ordering:
+            custom build → OS install → setup → diagnostics → everything else.
+          </p>
         </div>
 
         <div id="customBuildWrap" class="row hidden">
@@ -144,7 +147,7 @@
             <label><input type="checkbox" id="swOsInstall"> Operating system install</label>
             <label><input type="checkbox" id="swSetup"> Setup</label>
             <label><input type="checkbox" id="swUpdates"> System updates</label>
-            <label><input type="checkbox" id="swDriverUpdates" class="pcOnly"> Driver updates (PC only)</label>
+            <label class="pcOnly"><input type="checkbox" id="swDriverUpdates"> Driver updates (PC only)</label>
           </div>
         </div>
 
@@ -162,13 +165,13 @@
           <div id="diagFailWrap" class="row hidden">
             <label for="diagFailParts">What failed? (multi-select)</label>
             <select id="diagFailParts" multiple size="7">
-              <option value="cpu">CPU</option>
-              <option value="ram">RAM</option>
-              <option value="hdd/ssd">HDD/SSD</option>
-              <option value="motherboard">Motherboard</option>
-              <option value="gpu">GPU</option>
-              <option value="psu">PSU</option>
-              <option value="fans/case">Fans/Case</option>
+              <option value="CPU">CPU</option>
+              <option value="RAM">RAM</option>
+              <option value="HDD/SSD">HDD/SSD</option>
+              <option value="Motherboard">Motherboard</option>
+              <option value="GPU">GPU</option>
+              <option value="PSU">PSU</option>
+              <option value="Fans/Case">Fans/Case</option>
             </select>
 
             <div class="row">
