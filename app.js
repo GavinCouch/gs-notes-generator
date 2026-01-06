@@ -302,7 +302,7 @@ function buildNote() {
     if (selectedValues(iphoneRepairs).includes("other") && other) reps.push(other);
 
     if (reps.length > 0) {
-      sentences.push(sentence(`Replaced ${joinHuman(reps)}`));
+      sentences.push(sentence(`Performed ${joinHuman(reps)}`));
     } else {
       sentences.push(sentence("Hardware repair completed"));
     }
