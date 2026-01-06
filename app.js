@@ -49,6 +49,7 @@ const dbuFailReasonWrap = $("dbuFailReasonWrap");
 const dbuFailReason = $("dbuFailReason");
 const dbuDest = $("dbuDest");
 const dbuAmount = $("dbuAmount");
+const dbuUnit = $("dbuUnit");
 
 const installsWrap = $("installsWrap");
 const addSoftwareBtn = $("addSoftwareBtn");
@@ -473,10 +474,11 @@ function buildNote() {
       const suc = getRadio("dbuSuccess");
       const dest = (dbuDest.value || "").trim();
       const amt = (dbuAmount.value || "").trim();
-
+      const unit = (dbuUnit?.value || "GB").trim();
+      
       if (suc === "yes") {
         let s = "Completed data backup";
-        if (amt) s += ` (${amt} GB transferred)`;
+        if (amt) s += ` (${amt} ${unit} transferred)`;
         if (dest) s += ` to ${dest}`;
         bucket.dbu.push(sentence(s));
       } else {
@@ -603,6 +605,8 @@ copyBtn.addEventListener("click", async () => {
 
 resetBtn.addEventListener("click", () => {
   const keepInit = normalizeInitials(initials.value) || localStorage.getItem("gs_notes_initials") || "";
+  const dbuUnitEl = document.getElementById("dbuUnit");
+if (dbuUnitEl) dbuUnitEl.value = "GB";
 
   // reset selects/text/checkboxes
   document.querySelectorAll("input, select, textarea").forEach(el => {
