@@ -461,10 +461,10 @@ function buildNote() {
       const p = Number(policiesRemoved.value || 0);
 
       let base = "Performed operating system repair and verified system stability";
-      const extras = [];
+      const extras = ["temporary files cleaned out"]; // always include for OSR
       if (v > 0) extras.push(`${v} virus${v === 1 ? "" : "es"} removed`);
       if (p > 0) extras.push(`${p} malicious polic${p === 1 ? "y" : "ies"} removed`);
-      if (extras.length) base += `, including ${joinHuman(extras)}`;
+      base += `, including ${joinHuman(extras)}`;
       bucket.osRepair.push(sentence(base));
     }
 
