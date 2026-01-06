@@ -631,6 +631,26 @@ resetBtn.addEventListener("click", () => {
   refreshUI();
 });
 
+const sendFeedbackBtn = document.getElementById("sendFeedbackBtn");
+const feedbackText = document.getElementById("feedbackText");
+
+if (sendFeedbackBtn) {
+  sendFeedbackBtn.addEventListener("click", () => {
+    const text = (feedbackText.value || "").trim();
+
+    if (!text) {
+      alert("Please enter feedback before sending.");
+      return;
+    }
+
+    const subject = encodeURIComponent("Geek Squad Notes Generator Feedback");
+    const body = encodeURIComponent(text);
+
+    window.location.href =
+      `mailto:gavin.couch@bestbuy.com?subject=${subject}&body=${body}`;
+  });
+}
+
 // init
 (function init() {
   initials.value = localStorage.getItem("gs_notes_initials") || "";
