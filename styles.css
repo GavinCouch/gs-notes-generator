@@ -1,0 +1,105 @@
+:root {
+  --bg: #0b0c10;
+  --card: #14161d;
+  --text: #e7e9ee;
+  --muted: #a9afbd;
+  --line: #2a2f3a;
+  --accent: #5eead4;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.wrap { max-width: 980px; margin: 0 auto; padding: 18px; }
+header h1 { margin: 0 0 6px; font-size: 24px; }
+.sub { margin: 0; color: var(--muted); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  margin: 14px 0;
+}
+
+.subcard{
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+  background: rgba(255,255,255,0.02);
+}
+
+h2 { margin: 0 0 10px; font-size: 18px; }
+h3 { margin: 0 0 10px; font-size: 15px; color: var(--text); }
+
+.row { margin: 10px 0; }
+label { display: block; margin-bottom: 6px; color: var(--muted); }
+.inline { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+.grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px 12px; }
+
+input, select, textarea, button {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #0f1117;
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 14px;
+}
+.inline input, .inline select, .inline button { width: auto; }
+textarea { resize: vertical; }
+
+button {
+  cursor: pointer;
+  border-color: rgba(94,234,212,0.35);
+}
+button:hover { border-color: rgba(94,234,212,0.8); }
+button.secondary { border-color: var(--line); color: var(--text); opacity: 0.9; }
+
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.actions button { width: auto; }
+
+.hint { color: var(--muted); margin: 6px 0 0; font-size: 13px; }
+.hidden { display: none !important; }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--text);
+  background: rgba(255,255,255,0.02);
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+.chip button {
+  width: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border-color: var(--line);
+}
+
+.stack { display: grid; gap: 10px; }
+.partRow {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 10px;
+  align-items: center;
+}
+.partRow select { width: 100%; }
+
+.warn {
+  color: #ffb4b4;
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.foot { color: var(--muted); }
