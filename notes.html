@@ -148,6 +148,7 @@
           <div class="grid">
             <label><input type="checkbox" id="swDiagnostics"> Diagnostics</label>
             <label><input type="checkbox" id="swOsRepair"> Operating system repair</label>
+            <label><input type="checkbox" id="swBloatware"> Bloatware removal</label>
             <label><input type="checkbox" id="swDbu"> Data backup (DBU)</label>
             <label><input type="checkbox" id="swInstalls"> Software installs</label>
             <label><input type="checkbox" id="swAv"> Antivirus install/activation</label>
@@ -206,15 +207,46 @@
         <!-- OS Repair -->
         <div id="osRepairWrap" class="subcard hidden">
           <h3>Operating System Repair</h3>
+
           <div class="row">
-            <label for="virusesRemoved">Viruses removed (number)</label>
-            <input id="virusesRemoved" type="number" min="0" value="0" />
+            <label>OS repair type</label>
+            <div class="inline">
+              <label><input type="radio" name="osrType" value="malware" checked> Malware removal</label>
+              <label><input type="radio" name="osrType" value="tuneup"> Clean-up / tune-up</label>
+            </div>
           </div>
-          <div class="row">
-            <label for="policiesRemoved">Malicious policies removed (number)</label>
-            <input id="policiesRemoved" type="number" min="0" value="0" />
+
+          <div id="osrMalwareFields" class="row">
+            <div class="row">
+              <label for="osrTraces">Traces of infection found/removed (number)</label>
+              <input id="osrTraces" type="number" min="0" value="0" />
+            </div>
+            <div class="row">
+              <label for="osrPolicies">Malicious policies found/removed (number)</label>
+              <input id="osrPolicies" type="number" min="0" value="0" />
+            </div>
+            <p class="hint">If a value is 0, it will not be mentioned in the note.</p>
           </div>
-          <p class="hint">OS repair output always includes: temporary files cleaned out.</p>
+
+          <div id="osrTuneupFields" class="row hidden">
+            <div class="row">
+              <label for="osrTempFiles">Temporary files removed (manual number, optional)</label>
+              <input id="osrTempFiles" type="number" min="0" placeholder="e.g., 1542" />
+              <p class="hint">If left blank, the note will say “temporary files cleaned out.”</p>
+            </div>
+
+            <div class="row">
+              <label for="osrTraces2">Traces of infection found/removed (number)</label>
+              <input id="osrTraces2" type="number" min="0" value="0" />
+            </div>
+
+            <div class="row">
+              <label for="osrPolicies2">Malicious policies found/removed (number)</label>
+              <input id="osrPolicies2" type="number" min="0" value="0" />
+            </div>
+
+            <p class="hint">Clean-up/tune-up output includes “optimized system settings.” 0 values are omitted.</p>
+          </div>
         </div>
 
         <!-- DBU -->
@@ -363,3 +395,4 @@
   <script src="notes.js"></script>
 </body>
 </html>
+
