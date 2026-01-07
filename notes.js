@@ -26,6 +26,7 @@ const softwareDetails = $("softwareDetails");
 
 const swDiagnostics = $("swDiagnostics");
 const swOsRepair = $("swOsRepair");
+const swBloatware = $("swBloatware");
 const swDbu = $("swDbu");
 const swInstalls = $("swInstalls");
 const swAv = $("swAv");
@@ -40,8 +41,16 @@ const diagFailParts = $("diagFailParts");
 const diagIncludeRec = $("diagIncludeRec");
 const diagNowPassWrap = $("diagNowPassWrap");
 
-const virusesRemoved = $("virusesRemoved");
-const policiesRemoved = $("policiesRemoved");
+const osRepairWrap = $("osRepairWrap");
+const osrMalwareFields = $("osrMalwareFields");
+const osrTuneupFields = $("osrTuneupFields");
+
+const osrTraces = $("osrTraces");
+const osrPolicies = $("osrPolicies");
+
+const osrTempFiles = $("osrTempFiles");
+const osrTraces2 = $("osrTraces2");
+const osrPolicies2 = $("osrPolicies2");
 
 const dbuWrap = $("dbuWrap");
 const dbuFailReasonWrap = $("dbuFailReasonWrap");
@@ -123,6 +132,13 @@ function enforceLength(note) {
     warn.classList.remove("hidden");
   }
   return note;
+}
+
+function numVal(el, fallback = 0) {
+  const raw = (el?.value ?? "").toString().trim();
+  if (raw === "") return fallback;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : fallback;
 }
 
 // ---------- UI ----------
@@ -244,8 +260,15 @@ function refreshUI() {
   const diagReplaced = getRadio("diagReplaced");
   setHidden(diagNowPassWrap, !(swDiagnostics.checked && diagPass === "no" && diagReplaced === "yes"));
 
-  setHidden($("osRepairWrap"), !swOsRepair.checked);
+  // OSR
+  setHidden(osRepairWrap, !swOsRepair.checked);
+  if (swOsRepair.checked) {
+    const type = getRadio("osrType"); // malware | tuneup
+    setHidden(osrMalwareFields, type !== "malware");
+    setHidden(osrTuneupFields, type !== "tuneup");
+  }
 
+  // DBU
   setHidden(dbuWrap, !swDbu.checked);
   const dbuSuccess = getRadio("dbuSuccess");
   setHidden(dbuFailReasonWrap, !(swDbu.checked && dbuSuccess === "no"));
@@ -282,7 +305,6 @@ function buildNote() {
 
     const replacedList = [];
 
-    // whole unit replacement is a separate sentence (not "Replaced whole unit replacement")
     if (sel.includes("whole unit")) {
       sentences.push(sentence("Performed a whole unit replacement"));
     }
@@ -376,6 +398,7 @@ function buildNote() {
     setup: [],
     diagnostics: [],
     osRepair: [],
+    bloatware: [],
     dbu: [],
     installs: [],
     av: [],
@@ -423,18 +446,48 @@ function buildNote() {
       }
     }
 
-    // OS repair (always includes temp files cleaned out)
+    // OS Repair (malware vs tune-up)
     if (swOsRepair.checked) {
-      const v = Number(virusesRemoved.value || 0);
-      const p = Number(policiesRemoved.value || 0);
+      const type = getRadio("osrType"); // malware | tuneup
 
-      let base = "Performed operating system repair and verified system stability";
-      const extras = ["temporary files cleaned out"];
-      if (v > 0) extras.push(`${v} virus${v === 1 ? "" : "es"} removed`);
-      if (p > 0) extras.push(`${p} malicious polic${p === 1 ? "y" : "ies"} removed`);
-      base += `, including ${joinHuman(extras)}`;
+      if (type === "malware") {
+        const traces = numVal(osrTraces, 0);
+        const policies = numVal(osrPolicies, 0);
 
-      bucket.osRepair.push(sentence(base));
+        const extras = [];
+        if (traces > 0) extras.push(`${traces} trace${traces === 1 ? "" : "s"} of infection removed`);
+        if (policies > 0) extras.push(`${policies} malicious polic${policies === 1 ? "y" : "ies"} removed`);
+
+        let base = "Performed malware removal and verified system stability";
+        if (extras.length) base += `, including ${joinHuman(extras)}`;
+        bucket.osRepair.push(sentence(base));
+      } else {
+        const tempRaw = (osrTempFiles.value || "").toString().trim();
+        const tempNum = tempRaw === "" ? null : numVal(osrTempFiles, 0);
+
+        const traces = numVal(osrTraces2, 0);
+        const policies = numVal(osrPolicies2, 0);
+
+        const extras = ["optimized system settings"];
+
+        if (tempNum === null) {
+          extras.push("temporary files cleaned out");
+        } else {
+          extras.push(`${tempNum} temporary file${tempNum === 1 ? "" : "s"} removed`);
+        }
+
+        if (traces > 0) extras.push(`${traces} trace${traces === 1 ? "" : "s"} of infection removed`);
+        if (policies > 0) extras.push(`${policies} malicious polic${policies === 1 ? "y" : "ies"} removed`);
+
+        let base = "Performed clean-up/tune-up and verified system stability";
+        base += `, including ${joinHuman(extras)}`;
+        bucket.osRepair.push(sentence(base));
+      }
+    }
+
+    // Bloatware removal (no prompts)
+    if (swBloatware.checked) {
+      bucket.bloatware.push(sentence("Removed unnecessary preinstalled software (bloatware)"));
     }
 
     // DBU with units
@@ -492,6 +545,7 @@ function buildNote() {
     ordered.push(...bucket.setup);
     ordered.push(...bucket.diagnostics);
     ordered.push(...bucket.osRepair);
+    ordered.push(...bucket.bloatware);
     ordered.push(...bucket.dbu);
     ordered.push(...bucket.installs);
     ordered.push(...bucket.av);
@@ -511,6 +565,7 @@ function buildNote() {
   sentences.push(...bucket.setup);
   sentences.push(...bucket.diagnostics);
   sentences.push(...bucket.osRepair);
+  sentences.push(...bucket.bloatware);
   sentences.push(...bucket.dbu);
   sentences.push(...bucket.installs);
   sentences.push(...bucket.av);
@@ -539,8 +594,10 @@ $$('input[name="diagReplaced"]').forEach(el => el.addEventListener("change", ref
 $$('input[name="dbuSuccess"]').forEach(el => el.addEventListener("change", refreshUI));
 $$('input[name="filesPreserved"]').forEach(el => el.addEventListener("change", refreshUI));
 
+$$('input[name="osrType"]').forEach(el => el.addEventListener("change", refreshUI));
+
 [
-  swDiagnostics, swOsRepair, swDbu, swInstalls, swAv, swOsInstall, swSetup, swUpdates, swDriverUpdates
+  swDiagnostics, swOsRepair, swBloatware, swDbu, swInstalls, swAv, swOsInstall, swSetup, swUpdates, swDriverUpdates
 ].forEach(el => el.addEventListener("change", refreshUI));
 
 generateBtn.addEventListener("click", () => {
@@ -580,6 +637,7 @@ resetBtn.addEventListener("click", () => {
     }
   });
 
+  // defaults
   const pcNo = document.querySelector('input[name="pcHwDid"][value="no"]');
   if (pcNo) pcNo.checked = true;
 
@@ -604,7 +662,17 @@ resetBtn.addEventListener("click", () => {
   const fpYes = document.querySelector('input[name="filesPreserved"][value="yes"]');
   if (fpYes) fpYes.checked = true;
 
+  const osrMal = document.querySelector('input[name="osrType"][value="malware"]');
+  if (osrMal) osrMal.checked = true;
+
   if (dbuUnit) dbuUnit.value = "GB";
+
+  // reset OSR numbers to 0 where applicable
+  if (osrTraces) osrTraces.value = "0";
+  if (osrPolicies) osrPolicies.value = "0";
+  if (osrTraces2) osrTraces2.value = "0";
+  if (osrPolicies2) osrPolicies2.value = "0";
+  if (osrTempFiles) osrTempFiles.value = "";
 
   softwareItems = [];
   renderSoftwareChips();
