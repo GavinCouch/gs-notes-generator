@@ -230,8 +230,15 @@
 
           <div id="osrTuneupFields" class="row hidden">
             <div class="row">
-              <label for="osrTempFiles">Temporary files removed (manual number, optional)</label>
-              <input id="osrTempFiles" type="number" min="0" placeholder="e.g., 1542" />
+              <label>Temporary files removed (optional)</label>
+              <div class="inline">
+                <input id="osrTempSize" type="number" min="0" step="any" placeholder="e.g., 1.5" />
+                <select id="osrTempUnit">
+                  <option value="MB">MB</option>
+                  <option value="GB" selected>GB</option>
+                  <option value="TB">TB</option>
+                </select>
+              </div>
               <p class="hint">If left blank, the note will say “temporary files cleaned out.”</p>
             </div>
 
