@@ -48,7 +48,8 @@ const osrTuneupFields = $("osrTuneupFields");
 const osrTraces = $("osrTraces");
 const osrPolicies = $("osrPolicies");
 
-const osrTempFiles = $("osrTempFiles");
+const osrTempSize = $("osrTempSize");
+const osrTempUnit = $("osrTempUnit");
 const osrTraces2 = $("osrTraces2");
 const osrPolicies2 = $("osrPolicies2");
 
@@ -462,8 +463,9 @@ function buildNote() {
         if (extras.length) base += `, including ${joinHuman(extras)}`;
         bucket.osRepair.push(sentence(base));
       } else {
-        const tempRaw = (osrTempFiles.value || "").toString().trim();
-        const tempNum = tempRaw === "" ? null : numVal(osrTempFiles, 0);
+        const tempRaw = (osrTempSize?.value || "").toString().trim();
+        const tempNum = tempRaw === "" ? null : numVal(osrTempSize, 0);
+        const tempUnit = (osrTempUnit?.value || "GB").trim();
 
         const traces = numVal(osrTraces2, 0);
         const policies = numVal(osrPolicies2, 0);
@@ -473,7 +475,7 @@ function buildNote() {
         if (tempNum === null) {
           extras.push("temporary files cleaned out");
         } else {
-          extras.push(`${tempNum} temporary file${tempNum === 1 ? "" : "s"} removed`);
+          extras.push(`${tempNum} ${tempUnit} of temporary files removed`);
         }
 
         if (traces > 0) extras.push(`${traces} trace${traces === 1 ? "" : "s"} of infection removed`);
@@ -672,7 +674,8 @@ resetBtn.addEventListener("click", () => {
   if (osrPolicies) osrPolicies.value = "0";
   if (osrTraces2) osrTraces2.value = "0";
   if (osrPolicies2) osrPolicies2.value = "0";
-  if (osrTempFiles) osrTempFiles.value = "";
+  if (osrTempSize) osrTempSize.value = "";
+  if (osrTempUnit) osrTempUnit.value = "GB";
 
   softwareItems = [];
   renderSoftwareChips();
