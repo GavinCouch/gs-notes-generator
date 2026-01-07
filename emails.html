@@ -73,32 +73,27 @@
     </section>
 
     <!-- Closing -->
-    <section id="closingSection" class="card hidden">
-      <h2>Closing Email (Internal)</h2>
-      <p class="hint">Internal recap of devices staying overnight. Includes iPhone repair count and itemized list.</p>
+<section id="closingSection" class="card hidden">
+  <h2>Closing Email (Internal)</h2>
+  <p class="hint">Internal recap of devices staying overnight.</p>
 
-      <div class="row">
-        <label for="closingTo">To (optional)</label>
-        <input id="closingTo" type="text" placeholder="e.g., Precinct Leadership / Store Leadership (optional)" />
-      </div>
+  <div class="row">
+    <label for="closingIphoneCount">iPhone repairs (manual)</label>
+    <input id="closingIphoneCount" type="number" min="0" placeholder="e.g., 3" />
+  </div>
 
-      <div class="row">
-        <label>Add device entry</label>
-        <div class="grid3">
-          <select id="closeDeviceType">
-            <option value="">Device…</option>
-            <option value="iPhone">iPhone</option>
-            <option value="PC">PC</option>
-            <option value="MacBook">MacBook</option>
-          </select>
-          <input id="closeCxName" type="text" placeholder="Customer name" />
-          <input id="closeStatus" type="text" placeholder="Status / plan (short)" />
-        </div>
-        <button type="button" id="addCloseItemBtn" class="mt8">Add entry</button>
-      </div>
+  <div class="row">
+    <label>Add customer entry</label>
+    <div class="grid3">
+      <input id="closeCxName" type="text" placeholder="Customer name" />
+      <input id="closeWorkOrder" type="text" placeholder="Work order # (optional)" />
+      <input id="closeStatus" type="text" placeholder="Details (short)" />
+    </div>
+    <button type="button" id="addCloseItemBtn" class="mt8">Add entry</button>
+  </div>
 
-      <div id="closeItemsList" class="chips"></div>
-    </section>
+  <div id="closeItemsList" class="chips"></div>
+</section>
 
     <!-- Part failed -->
     <section id="partfailedSection" class="card hidden">
