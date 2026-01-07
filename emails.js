@@ -278,11 +278,13 @@ resetEmailBtn.addEventListener("click", () => {
 
   pickupNotes.value = "";
 
-  closingItems = [];
-  renderClosingChips();
-  closeDeviceType.value = "";
-  closeCxName.value = "";
-  closeStatus.value = "";
+closingItems = [];
+renderClosingChips();
+
+if (closingIphoneCount) closingIphoneCount.value = "";
+closeCxName.value = "";
+closeWorkOrder.value = "";
+closeStatus.value = "";
 
   failedPart.value = "";
   failedExtra.value = "";
