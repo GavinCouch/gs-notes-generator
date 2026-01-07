@@ -183,26 +183,35 @@ function buildClosingEmail(ara) {
   const subject = "Closing Recap: Overnight Devices";
 
   const lines = [];
+
+  // Greeting
   lines.push("Hi team,");
   lines.push("");
+
+  // iPhone count
   lines.push(`iPhone repairs: ${iphoneCount}`);
   lines.push("");
+
+  // Header
   lines.push("Devices staying overnight:");
   lines.push("");
 
+  // Customer entries
   if (closingItems.length === 0) {
-    lines.push("(No entries added.)");
+    lines.push("No devices remaining overnight.");
   } else {
-    for (let i = 0; i < closingItems.length; i++) {
-      const item = closingItems[i];
+    closingItems.forEach((item, index) => {
       const woPart = item.wo ? ` (WO#${item.wo})` : "";
-      lines.push(`- ${item.name}${woPart} - ${item.status}`);
+      lines.push(`${item.name}${woPart} - ${item.status}`);
 
-      // blank line between customers
-      if (i !== closingItems.length - 1) lines.push("");
-    }
+      // blank line BETWEEN customers
+      if (index !== closingItems.length - 1) {
+        lines.push("");
+      }
+    });
   }
 
+  // Space before closing
   lines.push("");
   lines.push("Thank you,");
   lines.push("");
