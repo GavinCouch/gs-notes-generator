@@ -25,8 +25,9 @@ const resetEmailBtn = $("resetEmailBtn");
 const pickupNotes = $("pickupNotes");
 
 // Closing fields
-const closeDeviceType = $("closeDeviceType");
+const closingIphoneCount = $("closingIphoneCount");
 const closeCxName = $("closeCxName");
+const closeWorkOrder = $("closeWorkOrder");
 const closeStatus = $("closeStatus");
 const addCloseItemBtn = $("addCloseItemBtn");
 const closeItemsList = $("closeItemsList");
