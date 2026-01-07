@@ -138,7 +138,6 @@ function buildBitLockerEmail(ara) {
     ``,
     `Thank you,`,
     `${ara}`,
-    `Geek Squad (please call the number on your service receipt if you need further assistance)`
   ];
 
   return { subject, body: joinLines(bodyLines) };
@@ -170,7 +169,6 @@ function buildPickupEmail(ara) {
     ``,
     `Thank you,`,
     `${ara}`,
-    `Geek Squad (please call the number on your service receipt if you need further assistance)`
   ].filter(line => line !== "");
 
   return { subject, body: joinLines(bodyLines) };
@@ -235,7 +233,6 @@ function buildPartFailedEmail(ara) {
     ``,
     `Thank you,`,
     `${ara}`,
-    `Geek Squad (please call the number on your service receipt if you need further assistance)`
   ].filter(Boolean);
 
   return { subject, body: joinLines(bodyLines) };
