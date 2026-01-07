@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Geek Squad Notes Generator</title>
+  <title>Geek Squad Notes Hub</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="wrap">
-    <h1>Geek Squad Notes Generator</h1>
+    <h1>Geek Squad Notes Hub</h1>
     <p class="sub">
       Feedback or suggestions?
       <a href="mailto:gavin.couch@bestbuy.com">gavin.couch@bestbuy.com</a>
@@ -17,333 +17,17 @@
 
   <main class="wrap">
     <section class="card">
-      <h2>Device</h2>
+      <h2>Choose a tool</h2>
+      <div class="home-grid">
+        <a class="home-tile" href="notes.html">
+          <div class="home-title">Customer Summary Notes</div>
+          <div class="home-desc">Generate one-paragraph Workbench/GSX-ready notes.</div>
+        </a>
 
-      <div class="row">
-        <label for="device">Device type</label>
-        <select id="device">
-          <option value="">Select…</option>
-          <option value="pc">PC</option>
-          <option value="mac">MacBook</option>
-          <option value="iphone">iPhone</option>
-        </select>
-      </div>
-    </section>
-
-    <!-- iPhone: Hardware -->
-    <section id="iphoneSection" class="card hidden">
-      <h2>iPhone Hardware Repair</h2>
-      <p class="hint">
-        iPhone notes always use <b>Replaced</b>. “Whole unit replacement” is written as “Performed a whole unit replacement.”
-      </p>
-
-      <div class="row">
-        <label for="iphoneRepairs">What was replaced? (multi-select)</label>
-        <select id="iphoneRepairs" multiple size="9">
-          <option value="display">Display</option>
-          <option value="battery">Battery</option>
-          <option value="back glass">Back glass</option>
-          <option value="rear system">Rear system</option>
-          <option value="mid system">Mid system</option>
-          <option value="whole unit">Whole unit replacement</option>
-          <option value="truedepth">TrueDepth</option>
-          <option value="back camera">Back camera</option>
-          <option value="other">Other (manual)</option>
-        </select>
-      </div>
-
-      <div id="iphoneOtherWrap" class="row hidden">
-        <label for="iphoneOther">Other repair (manual)</label>
-        <input id="iphoneOther" type="text" placeholder="e.g., charging port assembly" />
-      </div>
-    </section>
-
-    <!-- PC: Hardware -->
-    <section id="pcHardwareSection" class="card hidden">
-      <h2>PC Hardware</h2>
-
-      <div class="row">
-        <label>Hardware work performed?</label>
-        <div class="inline">
-          <label><input type="radio" name="pcHwDid" value="yes"> Yes</label>
-          <label><input type="radio" name="pcHwDid" value="no" checked> No</label>
-        </div>
-      </div>
-
-      <div id="pcHwDetails" class="hidden">
-        <div class="row">
-          <label for="pcHwParts">Hardware worked on (multi-select)</label>
-          <select id="pcHwParts" multiple size="10">
-            <option value="motherboard">Motherboard</option>
-            <option value="ram">RAM</option>
-            <option value="psu">PSU</option>
-            <option value="gpu">GPU</option>
-            <option value="ssd/hdd">SSD/HDD</option>
-            <option value="cpu">CPU</option>
-            <option value="cpu cooler">CPU Cooler</option>
-            <option value="wiring">Wiring</option>
-            <option value="pc case">PC Case</option>
-            <option value="miscellaneous part">Miscellaneous part</option>
-            <option value="custom build">Custom build</option>
-          </select>
-          <p class="hint">
-            If <b>Custom build</b> is selected, it disables other parts and overrides ordering:
-            custom build → OS install → setup → diagnostics → everything else.
-          </p>
-        </div>
-
-        <div id="customBuildWrap" class="row hidden">
-          <label>Custom build type</label>
-          <div class="inline">
-            <label><input type="radio" name="customBuildType" value="built"> Built a new custom PC from components</label>
-            <label><input type="radio" name="customBuildType" value="reassembled"> Reassembled customer-provided custom PC</label>
-          </div>
-        </div>
-
-        <div id="pcPartActions" class="row hidden">
-          <label>Actions (per selected part)</label>
-          <div id="pcPartActionsList" class="stack"></div>
-        </div>
-
-        <div class="row">
-          <label>Hardware work successful?</label>
-          <div class="inline">
-            <label><input type="radio" name="pcHwSuccess" value="yes" checked> Yes</label>
-            <label><input type="radio" name="pcHwSuccess" value="no"> No</label>
-          </div>
-        </div>
-
-        <div id="pcHwFailWrap" class="row hidden">
-          <label for="pcHwFailReason">If unsuccessful, explain (optional)</label>
-          <input id="pcHwFailReason" type="text" placeholder="Brief reason (optional)" />
-          <div class="inline">
-            <label><input type="checkbox" id="pcHwIncludeRec"> Include recommendation wording</label>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Software (PC/Mac only) -->
-    <section id="softwareSection" class="card hidden">
-      <h2>Software Work</h2>
-
-      <div id="pcSoftwareDidWrap" class="row hidden">
-        <label>Software work performed?</label>
-        <div class="inline">
-          <label><input type="radio" name="swDid" value="yes"> Yes</label>
-          <label><input type="radio" name="swDid" value="no" checked> No</label>
-        </div>
-      </div>
-
-      <div id="softwareDetails" class="hidden">
-        <div class="row">
-          <label>What was performed? (multi-select)</label>
-          <div class="grid">
-            <label><input type="checkbox" id="swDiagnostics"> Diagnostics</label>
-            <label><input type="checkbox" id="swOsRepair"> Operating system repair</label>
-            <label><input type="checkbox" id="swDbu"> Data backup (DBU)</label>
-            <label><input type="checkbox" id="swInstalls"> Software installs</label>
-            <label><input type="checkbox" id="swAv"> Antivirus install/activation</label>
-            <label><input type="checkbox" id="swOsInstall"> Operating system install</label>
-            <label><input type="checkbox" id="swSetup"> Setup</label>
-            <label><input type="checkbox" id="swUpdates"> System updates</label>
-            <label class="pcOnly"><input type="checkbox" id="swDriverUpdates"> Driver updates (PC only)</label>
-          </div>
-        </div>
-
-        <!-- Diagnostics -->
-        <div id="diagWrap" class="subcard hidden">
-          <h3>Diagnostics</h3>
-          <div class="row">
-            <label>All diagnostics passed?</label>
-            <div class="inline">
-              <label><input type="radio" name="diagPass" value="yes" checked> Yes</label>
-              <label><input type="radio" name="diagPass" value="no"> No</label>
-            </div>
-          </div>
-
-          <div id="diagFailWrap" class="row hidden">
-            <label for="diagFailParts">What failed? (multi-select)</label>
-            <select id="diagFailParts" multiple size="7">
-              <option value="CPU">CPU</option>
-              <option value="RAM">RAM</option>
-              <option value="HDD/SSD">HDD/SSD</option>
-              <option value="Motherboard">Motherboard</option>
-              <option value="GPU">GPU</option>
-              <option value="PSU">PSU</option>
-              <option value="Fans/Case">Fans/Case</option>
-            </select>
-
-            <div class="row">
-              <label>Were the failed components replaced?</label>
-              <div class="inline">
-                <label><input type="radio" name="diagReplaced" value="yes"> Yes</label>
-                <label><input type="radio" name="diagReplaced" value="no" checked> No</label>
-              </div>
-            </div>
-
-            <div id="diagNowPassWrap" class="row hidden">
-              <label>Do diagnostics pass now?</label>
-              <div class="inline">
-                <label><input type="radio" name="diagNowPass" value="yes" checked> Yes</label>
-                <label><input type="radio" name="diagNowPass" value="no"> No</label>
-              </div>
-            </div>
-
-            <div class="inline">
-              <label><input type="checkbox" id="diagIncludeRec"> Include recommendation wording</label>
-            </div>
-          </div>
-        </div>
-
-        <!-- OS Repair -->
-        <div id="osRepairWrap" class="subcard hidden">
-          <h3>Operating System Repair</h3>
-          <div class="row">
-            <label for="virusesRemoved">Viruses removed (number)</label>
-            <input id="virusesRemoved" type="number" min="0" value="0" />
-          </div>
-          <div class="row">
-            <label for="policiesRemoved">Malicious policies removed (number)</label>
-            <input id="policiesRemoved" type="number" min="0" value="0" />
-          </div>
-        </div>
-
-        <!-- DBU -->
-        <div id="dbuWrap" class="subcard hidden">
-          <h3>Data Backup (DBU)</h3>
-          <div class="row">
-            <label>Backup successful?</label>
-            <div class="inline">
-              <label><input type="radio" name="dbuSuccess" value="yes" checked> Yes</label>
-              <label><input type="radio" name="dbuSuccess" value="no"> No</label>
-            </div>
-          </div>
-
-          <div class="row">
-            <label for="dbuDest">Destination (manual)</label>
-            <input id="dbuDest" type="text" placeholder="e.g., customer external drive, new SSD, etc." />
-          </div>
-
-          <div class="row">
-            <label>Data transferred</label>
-            <div class="inline">
-              <input id="dbuAmount" type="number" min="0" step="any" placeholder="e.g., 238" />
-              <select id="dbuUnit">
-                <option value="MB">MB</option>
-                <option value="GB" selected>GB</option>
-                <option value="TB">TB</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="dbuFailReasonWrap" class="row hidden">
-            <label for="dbuFailReason">If unsuccessful, reason</label>
-            <select id="dbuFailReason">
-              <option value="">Select…</option>
-              <option value="drive failing">Drive failing</option>
-              <option value="encryption">Encryption</option>
-              <option value="permission issue">Permission issue</option>
-              <option value="destination full">Destination full</option>
-              <option value="customer declined">Customer declined</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Installs -->
-        <div id="installsWrap" class="subcard hidden">
-          <h3>Software Installs</h3>
-          <div class="row">
-            <label>Add software</label>
-            <div class="inline">
-              <input id="softwareItem" type="text" placeholder="e.g., Chrome, Office, Steam" />
-              <button type="button" id="addSoftwareBtn">Add</button>
-            </div>
-            <div id="softwareList" class="chips"></div>
-          </div>
-        </div>
-
-        <!-- AV -->
-        <div id="avWrap" class="subcard hidden">
-          <h3>Antivirus</h3>
-          <div class="row">
-            <label for="avName">Antivirus</label>
-            <select id="avName">
-              <option value="">Select…</option>
-              <option value="McAfee">McAfee</option>
-              <option value="Norton">Norton</option>
-              <option value="Webroot">Webroot</option>
-              <option value="Trend">Trend</option>
-              <option value="Malwarebytes">Malwarebytes</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div id="avOtherWrap" class="row hidden">
-            <label for="avOther">Other (manual)</label>
-            <input id="avOther" type="text" placeholder="Antivirus name" />
-          </div>
-
-          <div class="inline">
-            <label><input type="checkbox" id="avInstalled"> Installed</label>
-            <label><input type="checkbox" id="avActivated"> Activated</label>
-          </div>
-        </div>
-
-        <!-- OS Install -->
-        <div id="osInstallWrap" class="subcard hidden">
-          <h3>Operating System Install</h3>
-          <div class="row">
-            <label for="osChoice">Installed OS</label>
-            <select id="osChoice">
-              <option value="">Select…</option>
-              <option value="Windows 10">Windows 10</option>
-              <option value="Windows 11">Windows 11</option>
-              <option value="macOS">macOS</option>
-              <option value="Linux">Linux</option>
-            </select>
-          </div>
-
-          <div class="row">
-            <label>Personal files preserved?</label>
-            <div class="inline">
-              <label><input type="radio" name="filesPreserved" value="yes" checked> Yes</label>
-              <label><input type="radio" name="filesPreserved" value="no"> No (clean install)</label>
-            </div>
-            <p class="hint">Software/apps do not carry over; only personal files may be preserved.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Recycling + Comments + Initials -->
-    <section id="finalSection" class="card hidden">
-      <h2>Finalize</h2>
-
-      <div class="row">
-        <label><input type="checkbox" id="recycled"> Device recycled per customer request</label>
-      </div>
-
-      <div class="row">
-        <label for="extraComments">Additional comments (optional)</label>
-        <textarea id="extraComments" rows="3" placeholder="Anything not covered above…"></textarea>
-      </div>
-
-      <div class="row">
-        <label for="initials">Agent initials (required)</label>
-        <input id="initials" type="text" maxlength="6" placeholder="e.g., GC" />
-      </div>
-
-      <div class="row actions">
-        <button type="button" id="generateBtn">Generate Note</button>
-        <button type="button" id="copyBtn" class="secondary">Copy</button>
-        <button type="button" id="resetBtn" class="secondary">Reset</button>
-      </div>
-
-      <div class="row">
-        <label for="output">Generated note</label>
-        <textarea id="output" rows="6" readonly></textarea>
-        <p id="warn" class="warn hidden"></p>
+        <a class="home-tile" href="emails.html">
+          <div class="home-title">Emails</div>
+          <div class="home-desc">Generate common customer/internal emails (subject + body).</div>
+        </a>
       </div>
     </section>
   </main>
@@ -351,7 +35,5 @@
   <footer class="wrap foot">
     <small>Runs fully in your browser. No data is sent anywhere.</small>
   </footer>
-
-  <script src="app.js"></script>
 </body>
 </html>
