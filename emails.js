@@ -177,32 +177,38 @@ function buildPickupEmail(ara) {
 }
 
 function buildClosingEmail(ara) {
-  const iphoneCount = closingItems.filter(i => i.device === "iPhone").length;
+  const rawCount = (closingIphoneCount?.value || "").trim();
+  const iphoneCount = rawCount === "" ? "0" : rawCount;
 
   const subject = "Closing Recap: Overnight Devices";
-  const bodyLines = [
-    `Hi team,`,
-    ``,
-    `iPhone repairs: ${iphoneCount}`,
-    ``,
-    `Devices staying overnight:`
-  ];
+
+  const lines = [];
+  lines.push("Hi team,");
+  lines.push("");
+  lines.push(`iPhone repairs: ${iphoneCount}`);
+  lines.push("");
+  lines.push("Devices staying overnight:");
+  lines.push("");
 
   if (closingItems.length === 0) {
-    bodyLines.push(`(No entries added.)`);
+    lines.push("(No entries added.)");
   } else {
-    for (const item of closingItems) {
-      bodyLines.push(`- ${item.device} — ${item.name} — ${item.status}`);
+    for (let i = 0; i < closingItems.length; i++) {
+      const item = closingItems[i];
+      const woPart = item.wo ? ` (WO#${item.wo})` : "";
+      lines.push(`- ${item.name}${woPart} - ${item.status}`);
+
+      // blank line between customers
+      if (i !== closingItems.length - 1) lines.push("");
     }
   }
 
-  bodyLines.push(
-    ``,
-    `Thank you,`,
-    `${ara}`
-  );
+  lines.push("");
+  lines.push("Thank you,");
+  lines.push("");
+  lines.push(ara);
 
-  return { subject, body: joinLines(bodyLines) };
+  return { subject, body: joinLines(lines) };
 }
 
 function buildPartFailedEmail(ara) {
