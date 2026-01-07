@@ -103,14 +103,15 @@ function renderClosingChips() {
 }
 
 addCloseItemBtn.addEventListener("click", () => {
-  const device = (closeDeviceType.value || "").trim();
   const name = (closeCxName.value || "").trim();
+  const wo = (closeWorkOrder.value || "").trim();
   const status = (closeStatus.value || "").trim();
-  if (!device || !name || !status) return;
+  if (!name || !status) return;
 
-  closingItems.push({ device, name, status });
-  closeDeviceType.value = "";
+  closingItems.push({ name, wo, status });
+
   closeCxName.value = "";
+  closeWorkOrder.value = "";
   closeStatus.value = "";
   renderClosingChips();
 });
