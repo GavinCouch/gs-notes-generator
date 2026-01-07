@@ -86,7 +86,9 @@ function renderClosingChips() {
   closingItems.forEach((item, idx) => {
     const chip = document.createElement("span");
     chip.className = "chip";
-    chip.textContent = `${item.device} — ${item.name} — ${item.status}`;
+
+    const woPart = item.wo ? ` (WO#${item.wo})` : "";
+    chip.textContent = `${item.name}${woPart} - ${item.status}`;
 
     const btn = document.createElement("button");
     btn.type = "button";
