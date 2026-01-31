@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Emails</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Emails</h1>
+        <p class="sub">
+          Generate subject + body •
+          <a href="index.html">Home</a>
+        </p>
+      </div>
+      <div class="top-actions">
+        <a class="btn secondary" href="notes.html">Customer Summary Notes</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Email Type</h2>
+
+      <div class="row">
+        <label for="emailType">Choose template</label>
+        <select id="emailType">
+          <option value="">Select…</option>
+          <option value="bitlocker">1) BitLocker Key Request</option>
+          <option value="pickup">2) Device Ready for Pickup</option>
+          <option value="closing">3) Closing Email (Back - Overnight Recap)</option>
+          <option value="partfailed">4) Part Failed (Needs Replacement)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <label for="araName">ARA name (required)</label>
+        <input id="araName" type="text" placeholder="e.g., Gavin" />
+      </div>
+    </section>
+
+    <!-- BitLocker -->
+    <section id="bitlockerSection" class="card hidden">
+      <h2>BitLocker Key Request</h2>
+      <p class="hint">Customer-facing. Includes basic steps and asks the customer to reply with the recovery key.</p>
+    </section>
+
+    <!-- Pickup -->
+    <section id="pickupSection" class="card hidden">
+      <h2>Ready for Pickup</h2>
+
+      <div class="row">
+        <label>Why email instead of calling?</label>
+        <div class="inline">
+          <label><input type="radio" name="pickupReason" value="unable" checked> Unable to reach you by phone</label>
+          <label><input type="radio" name="pickupReason" value="late"> Too late in the day to call</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="pickupNotes">Optional internal details to include (optional)</label>
+        <input id="pickupNotes" type="text" placeholder="e.g., voicemail left earlier (optional)" />
+      </div>
+
+      <p class="hint">
+        Includes: schedule pickup appointment by calling the number on the service receipt or via Best Buy app/website,
+        walk-ins allowed but appointments come first, bring photo ID.
+      </p>
+    </section>
+
+    <!-- Closing -->
+<section id="closingSection" class="card hidden">
+  <h2>Closing Email (Internal)</h2>
+  <p class="hint">Internal recap of devices staying overnight.</p>
+
+  <div class="row">
+    <label for="closingIphoneCount">iPhone repairs (manual)</label>
+    <input id="closingIphoneCount" type="number" min="0" placeholder="e.g., 3" />
+  </div>
+
+  <div class="row">
+    <label>Add customer entry</label>
+    <div class="grid3">
+      <input id="closeCxName" type="text" placeholder="Customer name" />
+      <input id="closeWorkOrder" type="text" placeholder="Work order # (optional)" />
+      <input id="closeStatus" type="text" placeholder="Details (short)" />
+    </div>
+    <button type="button" id="addCloseItemBtn" class="mt8">Add entry</button>
+  </div>
+
+  <div id="closeItemsList" class="chips"></div>
+</section>
+
+    <!-- Part failed -->
+    <section id="partfailedSection" class="card hidden">
+      <h2>Part Failed</h2>
+      <p class="hint">
+        Customer-facing. Explains diagnostics indicate a part failure and that it needs replacement.
+        Customer action: schedule a revisit or call the number on the service receipt for more details.
+      </p>
+
+      <div class="row">
+        <label for="failedPart">Which part failed? (manual)</label>
+        <input id="failedPart" type="text" placeholder="e.g., SSD, RAM, GPU, battery, motherboard" />
+      </div>
+
+      <div class="row">
+        <label for="failedExtra">Optional extra details (optional)</label>
+        <input id="failedExtra" type="text" placeholder="Short additional detail (optional)" />
+      </div>
+    </section>
+
+    <!-- Output -->
+    <section id="emailOutputSection" class="card hidden">
+      <h2>Generated Email</h2>
+
+      <div class="row">
+        <label for="emailSubject">Subject</label>
+        <input id="emailSubject" readonly />
+      </div>
+
+      <div class="row">
+        <label for="emailBody">Body</label>
+        <textarea id="emailBody" rows="10" readonly></textarea>
+      </div>
+
+      <div class="row actions">
+        <button type="button" id="genEmailBtn">Generate</button>
+        <button type="button" id="copySubjectBtn" class="secondary">Copy Subject</button>
+        <button type="button" id="copyBodyBtn" class="secondary">Copy Body</button>
+        <button type="button" id="resetEmailBtn" class="secondary">Reset</button>
+      </div>
+
+      <p id="emailWarn" class="warn hidden"></p>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <small>Runs fully in your browser. No data is sent anywhere.</small>
+  </footer>
+
+  <script src="emails.js"></script>
+</body>
+</html>
